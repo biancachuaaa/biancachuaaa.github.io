@@ -65,7 +65,7 @@
             db.collection("works").get().then((snapshot) =>{
                 snapshot.forEach((doc) => {
                     document.getElementById('project').innerHTML += `<a href="${doc.data().link}">${doc.data().name}</a><br><br>`;
-                    document.getElementById('project').innerHTML += `<div id = "description">${doc.data().lab}<br><br>${doc.data().description}<br><br><br>`;
+                    document.getElementById('project').innerHTML += `<div id = "description">Programming language used: ${doc.data().lab}<br><br>${doc.data().description}<br><br><br>`;
                 });
             });
        
