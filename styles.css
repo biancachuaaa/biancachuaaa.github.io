@@ -284,3 +284,65 @@ footer a:hover{
     align-items: center;
     border-right: 5px solid #7acfcf;
 }
+
+/* edit html */
+.login_box{
+    width: 400px;
+    padding: 30px;
+    margin: auto;
+}
+
+.authentication{
+    border-radius: 10%;
+    padding: 10px;
+    position: relative;
+    background: #7acfcf;
+    text-align: center;
+}
+
+.login{
+    position: relative;
+    margin: 10px;
+    padding: 35px;
+    text-align: center;
+}
+
+form input{
+    font-family: 'Montserrat';
+    background: white;
+    border: 0px;
+    width: 100%;
+    margin: 10px;
+    padding: 10px;
+    font-size: 15px;
+}
+
+form button{
+    font-family: 'Montserrat';
+    text-transform: uppercase;
+    border: 0px;
+    background: white;
+    margin: 10px;
+    padding: 10px;
+    width: 100%;
+    color:black;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+form button:hover{
+    color:#7acfcf;
+}
+
+#logo_position{
+    display:flex;
+    justify-content: center;
+}
+
+#logo_login{
+    width:125px;
+    height: 125px;
+    border-radius: 100%;
+    position: relative;
+    top: 20px;
+}
