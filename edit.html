@@ -8,10 +8,10 @@
     </head>
 
     <body>
-        <div id = "logo_position">
-            <img id="logo_login" src="BC_logo_white.png">
-        </div>
         <div class="login_box">
+            <div id = "logo_position">
+                <img id="logo_login" src="BC_logo_white.png">
+            </div>
             <div class="authentication">
                 <form class="login">
                     <input id ="email" type="text" placeholder="email">
@@ -20,6 +20,54 @@
                 </form>
             </div>
         </div>
+
+        <div id = "editable_info">
+            <header>
+                <div id="logo_placement">
+                    <img id="logo" src="BC_logo_white.png">
+                </div>
+            </header>
+        
+            <div id="about_template">
+                    <div id = "intro_border">
+                        <div id = "introduction"></div>
+                    </div>
+                    <button id = "about_edit">Edit</button>
+
+                    <div id="modal1" class="modal"> 
+                        <div id="descript_modal" class="modal-content">
+                            <span class="close">&times;</span>
+                            <h1>Description</h1>
+                            <form id="intro">
+                                <input id = "edit_descript" type="text" placeholder="Edit description">
+                                <button id = "edit_submit">Submit</button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div id = "hobbies">
+                        <span id="hobbies_title">Hobbies</span>
+                    </div>
+            </div>
+        
+            <div id ="organizations">Organizations</div>
+            <div id="org_container"></div>
+    
+            <div id ="organizations">Education Timeline</div>
+            <div id = "education_template"></div>
+        
+            <div id ="organizations">Works</div>
+            <div id = "work_template">
+                <div id = "project"></div>
+            </div>
+        
+        
+            <footer id = "container2">
+                <div id = "contact">CONTACT ME</div>
+            </footer>
+        </div>
+
+
 
          <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
@@ -44,6 +92,8 @@
         var defaultPorject = firebase.initializeApp(firebaseConfig);
         var db = firebase.firestore();
 
+        document.getElementById("editable_info").style.display = "none";
+
 
         document.getElementById("login").addEventListener("click", function(e){
             e.preventDefault();
@@ -54,53 +104,75 @@
                 console.log(email);
                 console.log(password);
                 console.log("success");
-        });
+                document.getElementsByClassName("login_box")[0].style.display = "none";
+                document.getElementById("editable_info").style.display = "block";
+        
+                db.collection("about").get().then((snapshot) => {
+                    snapshot.forEach((doc) => {
+                        document.getElementById('introduction').innerHTML += `${doc.data().introduction}`;
+                    });
+                });
+
+                db.collection("contact").get().then((snapshot) =>{
+                    snapshot.forEach((doc) => {
+                        document.getElementById('container2').innerHTML += `<img class="sm_logo" src ="${doc.data().logo}">`;
+                        document.getElementById('container2').innerHTML += `<a href="${doc.data().url}">${doc.data().username}</a>`;
+                    });
+                });
+
+                db.collection("hobbies").get().then((snapshot) =>{
+                    snapshot.forEach((doc) => {
+                        document.getElementById('hobbies').innerHTML += `<li>${doc.data().hobby}</li>`;
+                    });
+                });
+
+                db.collection("organizations").get().then((snapshot) =>{
+                    snapshot.forEach((doc) => {
+                        document.getElementById('org_container').innerHTML += `<div id = "orgs"><img class="org_logo" src ="${doc.data().logo}"><br>${doc.data().org_name}<br>${doc.data().position}</div>`;
+                    });
+                });
+
+                db.collection("educations").orderBy('year_start','asc').get().then((snapshot) =>{
+                        snapshot.forEach((doc) => {
+                            document.getElementById('education_template').innerHTML += `<div id = "edu_logo_template"><img class="education_logo" src ="${doc.data().logo}"></div>`;
+                            if((doc.data().grade_start && doc.data().grade_end && doc.data().year_end) == null){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - Present</div>`;
+                            }
+                            else if(doc.data().grade_end == doc.data().grade_start){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end} | Grade ${doc.data().grade_start}</div>`;   
+                            }
+                            else{
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end} | Grades ${doc.data().grade_start}-${doc.data().grade_end}</div>`;    
+                            }
+                        });
+                    });
+                
+                db.collection("works").get().then((snapshot) =>{
+                        snapshot.forEach((doc) => {
+                            document.getElementById('project').innerHTML += `<a href="${doc.data().link}">${doc.data().name}</a><br><br>`;
+                            document.getElementById('project').innerHTML += `<div id = "description">Programming language used: ${doc.data().lab}<br><br>${doc.data().description}<br><br><br>`;
+                        });
+                    });
+                });
+
+                var modal1 = document.getElementById("modal1");
+                var aboutbtn = document.getElementById("about_edit");
+                var close = document.getElementsByClassName("close")[0];
+
+                aboutbtn.addEventListener("click", openModal);
+                close.addEventListener("click", closeModal);
+
+                function openModal(){
+                    modal1.style.display = "block";
+                }
+
+                function closeModal(){
+                    modal1.style.display = "none";
+                }
+
+                
+
         })
-
-
-
-
-        //  db.collection("educations").get().then(function(snapshot){
-        //     snapshot.forEach(function(doc){
-        //         console.log(doc.data());
-        //     })
-        //  });
-
-        // var newObject = {
-        //     name:"IEEE",
-        //     position:"member",
-        //     year_start: 2014,
-        //     year_end: 2020
-        // }
-
-        // db.collection("organizations").add(newObject).then(function(doc){
-        //     console.log("Item added with the uid: " + doc.id);
-        // })
-
-        // db.collection("organizations").doc("FT75nXFAEdGf9eKVuFbC").delete().then(function(){
-        //     console.log("item delete");
-        // }).catch(function(err){
-        //     console.log("error in deleting item"+err);
-        // });
-
-        // var email = "bianca_louise_chua@dlsu.edu.ph";
-        // var password = "125-Potato1";
-
-        // firebase.auth().signInWithEmailAndPassword(email,password).then(function(user){
-        //     console.log("user sign in");
-
-        //     var user = firebase.auth().currentUser;
-        //     if(user!=null){
-        //         console.log(user.email);
-        //     }
-
-        // }).catch(function(err){
-        //     if(err.code == "auth/wrong-password"){
-        //         alert("wrong password")
-        //     }else{
-        //         alert(err.message);
-        //     }
-        // })
 
     </script>
 
