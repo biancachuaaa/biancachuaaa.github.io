@@ -39,32 +39,98 @@
                             <span class="close">&times;</span>
                             <h1>Description</h1>
                             <form id="intro">
-                                <input id = "edit_descript" type="text" placeholder="Edit description">
+                                <textarea id = "edit_descript" rows="10"cols="125"></textarea>
                                 <button id = "edit_submit">Submit</button>
                             </form>
                         </div>
                     </div>
 
-                    <div id = "hobbies">
+                    <div id = "hobbies1">
                         <span id="hobbies_title">Hobbies</span>
+                        <div id="hobby_list"></div>
                     </div>
+                    <button id="hobby_add">Add a hobby</button>
+
+                    <div id="modal2" class="modal"> 
+                        <div id="hobbies_modal" class="modal-content">
+                            <span class="close">&times;</span>
+                            <h1>Add a new hobby</h1>
+                            <form id="hobbies_add">
+                                <input id = "new_hobby" type = "text" placeholder="Add a new hobby">
+                                <button id = "hobby_submit">Add</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+        
+            <br>
+            <br>
+                    <div id ="organizations"><button id="add_org">Add a org</button>Organizations</div>
+                    <div id="org_container"></div>
+
+                    <div id="modal3" class="modal"> 
+                        <div id="orgs_modal" class="modal-content">
+                            <span class="close">&times;</span>
+                            <h1>Add a new organization</h1>
+                            <form id="adding_org">
+                                <span>Logo: </span><input id = "new_org_logo" type = "text" placeholder="Place URL of logo">
+                                <span>Organization name: </span><input id = "new_org_name" type = "text" placeholder="insert name of organization">
+                                <span>Position: </span><input id = "new_org_position" type = "text" placeholder="insert position within the organization">
+                                <button id = "org_submit">Add</button>
+                            </form>
+                        </div>
+                    </div>
+
+    
+            <div id ="organizations"><button id="add_school">Add a school</button>Education Timeline</div>
+            <div id = "education_template"></div>
+
+            <div id="modal4" class="modal"> 
+                <div id="school_modal" class="modal-content">
+                    <span class="close">&times;</span>
+                    <h1>Add a new school</h1>
+                    <form id="adding_school">
+                        <span>Logo: </span><input id = "new_school_logo" type = "text" placeholder="Place URL of logo">
+                        <span>School name: </span><input id = "new_school_name" type = "text" placeholder="insert name of school">
+                        <span>Year Start: </span><input id = "new_year_start" type = "text" placeholder="insert year started at the school">
+                        <span>Year End: </span><input id = "new_year_end" type = "text" placeholder="insert year ended at the school">
+                        <button id = "school_submit">Add</button>
+                    </form>
+                </div>
             </div>
         
-            <div id ="organizations">Organizations</div>
-            <div id="org_container"></div>
-    
-            <div id ="organizations">Education Timeline</div>
-            <div id = "education_template"></div>
-        
-            <div id ="organizations">Works</div>
+            <div id ="organizations"><button id="add_work">Add a work</button>Works</div>
             <div id = "work_template">
                 <div id = "project"></div>
             </div>
+            <div id="modal5" class="modal"> 
+                <div id="works_modal" class="modal-content">
+                    <span class="close">&times;</span>
+                    <h1>Add a new work</h1>
+                    <form id="adding_works">
+                        <span>Title: </span><input id = "new_work_title" type = "text" placeholder="Place the title of the project">
+                        <span>Link: </span><input id = "new_work_link" type = "text" placeholder="insert the link to your project">
+                        <span>Language used: </span><input id = "new_work_language" type = "text" placeholder="input the language you used to create the project">
+                        <span>Description: </span><textarea id ="new_work_description" rows="10"cols="115"></textarea>
+                        <button id = "work_submit">Add</button>
+                    </form>
+                </div>
+            </div>
         
-        
-            <footer id = "container2">
-                <div id = "contact">CONTACT ME</div>
+            <div id = "contact">CONTACT ME</div><br>
+            <footer id = "edit_contact_container">
             </footer>
+            <div id="modal6" class="modal"> 
+                <div id="contact_modal" class="modal-content">
+                    <span class="close">&times;</span>
+                    <h1>Edit contact link</h1>
+                    <form id="intro">
+                        <span>Username: </span><input id = "edit_username" type="text" placeholder="input new username">
+                        <span>Link: </span><input id = "edit_link" type="text" placeholder="input new link to page">
+                        <button id = "edit_contact">Submit</button>
+                    </form>
+                </div>
+            </div>
         </div>
 
 
@@ -101,80 +167,267 @@
             var password = document.getElementById("password").value;
 
             firebase.auth().signInWithEmailAndPassword(email,password).then(function(user){
-                console.log(email);
-                console.log(password);
+                console.log("email: " + email);
+                console.log("password: "+ password);
                 console.log("success");
                 document.getElementsByClassName("login_box")[0].style.display = "none";
                 document.getElementById("editable_info").style.display = "block";
-        
-                db.collection("about").get().then((snapshot) => {
-                    snapshot.forEach((doc) => {
-                        document.getElementById('introduction').innerHTML += `${doc.data().introduction}`;
-                    });
-                });
-
-                db.collection("contact").get().then((snapshot) =>{
-                    snapshot.forEach((doc) => {
-                        document.getElementById('container2').innerHTML += `<img class="sm_logo" src ="${doc.data().logo}">`;
-                        document.getElementById('container2').innerHTML += `<a href="${doc.data().url}">${doc.data().username}</a>`;
-                    });
-                });
-
-                db.collection("hobbies").get().then((snapshot) =>{
-                    snapshot.forEach((doc) => {
-                        document.getElementById('hobbies').innerHTML += `<li>${doc.data().hobby}</li>`;
-                    });
-                });
-
-                db.collection("organizations").get().then((snapshot) =>{
-                    snapshot.forEach((doc) => {
-                        document.getElementById('org_container').innerHTML += `<div id = "orgs"><img class="org_logo" src ="${doc.data().logo}"><br>${doc.data().org_name}<br>${doc.data().position}</div>`;
-                    });
-                });
-
-                db.collection("educations").orderBy('year_start','asc').get().then((snapshot) =>{
-                        snapshot.forEach((doc) => {
-                            document.getElementById('education_template').innerHTML += `<div id = "edu_logo_template"><img class="education_logo" src ="${doc.data().logo}"></div>`;
-                            if((doc.data().grade_start && doc.data().grade_end && doc.data().year_end) == null){
-                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - Present</div>`;
-                            }
-                            else if(doc.data().grade_end == doc.data().grade_start){
-                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end} | Grade ${doc.data().grade_start}</div>`;   
-                            }
-                            else{
-                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end} | Grades ${doc.data().grade_start}-${doc.data().grade_end}</div>`;    
-                            }
-                        });
-                    });
-                
-                db.collection("works").get().then((snapshot) =>{
-                        snapshot.forEach((doc) => {
-                            document.getElementById('project').innerHTML += `<a href="${doc.data().link}">${doc.data().name}</a><br><br>`;
-                            document.getElementById('project').innerHTML += `<div id = "description">Programming language used: ${doc.data().lab}<br><br>${doc.data().description}<br><br><br>`;
-                        });
-                    });
-                });
-
-                var modal1 = document.getElementById("modal1");
-                var aboutbtn = document.getElementById("about_edit");
-                var close = document.getElementsByClassName("close")[0];
-
-                aboutbtn.addEventListener("click", openModal);
-                close.addEventListener("click", closeModal);
-
-                function openModal(){
-                    modal1.style.display = "block";
-                }
-
-                function closeModal(){
-                    modal1.style.display = "none";
-                }
-
-                
-
+            });
         })
 
-    </script>
 
+        db.collection("about").get().then((snapshot) => {
+            snapshot.forEach((doc) => {
+                document.getElementById('introduction').innerHTML += `${doc.data().introduction}`;
+            });
+        });
+
+        // modal for editing contact
+
+        var modal6 = document.getElementById("modal6");
+        var close5 = document.getElementsByClassName("close")[5];
+        var edit_contact = document.getElementById("edit_contact");
+        var edit_link = document.getElementById("edit_link");
+        var edit_username = document.getElementById("edit_username");
+
+        close5.addEventListener("click", closeModal5);
+
+        function editing_contact(uid){
+            modal6.style.display = "block";
+            edit_contact.addEventListener("click",function(e){
+                e.preventDefault();
+                    db.collection("contact").doc(uid.id).update({
+                        username: edit_username.value,
+                        url: edit_link.value
+                    })
+                modal6.style.display="none";
+                console.log("Item succesfully updated");
+            })
+        }
+
+        function closeModal5(){
+            modal6.style.display = "none";
+        }
+
+        db.collection("contact").get().then((snapshot) =>{
+            snapshot.forEach((doc) => {
+                document.getElementById('edit_contact_container').innerHTML += `<img class="sm_logo" src ="${doc.data().logo}"> <button class="contact_edit" id="${doc.id}" onClick=editing_contact(this)>Edit</button>`;
+                document.getElementById('edit_contact_container').innerHTML += `<a href="${doc.data().url}">${doc.data().username}</a>`;
+            });
+        });
+
+        function erase_hobby(uid){
+                db.collection("hobbies").doc(uid.id).delete().then(function(){
+                    console.log("Item successfully deleted with UID: "+uid.id);
+                })   
+        }
+
+        db.collection("hobbies").get().then((snapshot) =>{
+            snapshot.forEach((doc) => {
+                document.getElementById('hobby_list').innerHTML += `<div>${doc.data().hobby} <button class="delete"  id="${doc.id}" onClick=erase_hobby(this)>&times;</button></div>`;
+            });
+        });
+
+        function erase_org(uid){
+                db.collection("organizations").doc(uid.id).delete().then(function(){
+                    console.log("Item successfully deleted with UID: "+uid.id);
+                })   
+        }
+        db.collection("organizations").get().then((snapshot) =>{
+            snapshot.forEach((doc) => {
+                document.getElementById('org_container').innerHTML += `<div id = "orgs"><img class="org_logo" src ="${doc.data().logo}"><br>${doc.data().org_name}<br>${doc.data().position} <button class="delete"  id="${doc.id}" onClick=erase_org(this)>&times;</button></div>`;
+            });
+        });
+
+        function erase_school(uid){
+                db.collection("educations").doc(uid.id).delete().then(function(){
+                    console.log("Item successfully deleted with UID: "+uid.id);
+                })   
+        }
+
+        db.collection("educations").orderBy('year_start','asc').get().then((snapshot) =>{
+                snapshot.forEach((doc) => {
+                    document.getElementById('education_template').innerHTML += `<div id = "edu_logo_template"><img class="education_logo" src ="${doc.data().logo}"></div>`;
+                    if((doc.data().grade_start && doc.data().grade_end && doc.data().year_end) == null){
+                        document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - Present | Degree: ${doc.data().degree}<button class="delete"  id="${doc.id}" onClick=erase_school(this)>&times;</button></div>`;
+                    }
+                    else if(doc.data().grade_end == doc.data().grade_start){
+                        document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end} | Grade ${doc.data().grade_start} <button class="delete"  id="${doc.id}" onClick=erase_school(this)>&times;</button></div>`;   
+                    }
+                    else{
+                        document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end} | Grades ${doc.data().grade_start}-${doc.data().grade_end} <button class="delete"  id="${doc.id}" onClick=erase_school(this)>&times;</button></div>`;    
+                    }
+                });
+            });
+
+        function erase_work(uid){
+                db.collection("works").doc(uid.id).delete().then(function(){
+                    console.log("Item successfully deleted with UID: "+uid.id);
+                })   
+        }
+        
+        db.collection("works").get().then((snapshot) =>{
+                snapshot.forEach((doc) => {
+                    document.getElementById('project').innerHTML += `<a href="${doc.data().link}">${doc.data().name}</a> <button class="delete_work"  id="${doc.id}" onClick=erase_work(this)>&times;</button> <br><br>`;
+                    document.getElementById('project').innerHTML += `<div id = "description">Programming language used: ${doc.data().lab}<br><br>${doc.data().description}<br><br><br>`;
+                });
+            });
+
+        // modal for editing description
+
+        var modal1 = document.getElementById("modal1");
+        var aboutbtn = document.getElementById("about_edit");
+        var close = document.getElementsByClassName("close")[0];
+        var edit_submit = document.getElementById("edit_submit");
+        var edit_descript = document.getElementById("edit_descript");
+
+        aboutbtn.addEventListener("click", openModal);
+        close.addEventListener("click", closeModal);
+
+        function openModal(){
+            modal1.style.display = "block";
+            edit_submit.addEventListener("click",function(e){
+                e.preventDefault();
+                if(edit_descript.value != ""){
+                    db.collection("about").doc("WJFXcGzbexFcm2hFUaNS").update({
+                        introduction: edit_descript.value
+                    })
+                    modal1.style.display="none";
+                    console.log="Item succesfully updated"
+                }
+            })
+        }
+
+        function closeModal(){
+            modal1.style.display = "none";
+        }
+
+        // modal for hobbies
+
+        var modal2 = document.getElementById("modal2");
+        var hobby_add = document.getElementById("hobby_add");
+        var close1 = document.getElementsByClassName("close")[1];
+        var hobby_submit = document.getElementById("hobby_submit");
+        var new_hobby = document.getElementById("new_hobby");
+
+        hobby_add.addEventListener("click", openModal1);
+        close1.addEventListener("click", closeModal1);
+
+        function openModal1(){
+            modal2.style.display = "block";
+            hobby_submit.addEventListener("click",function(e){
+                e.preventDefault();
+                if(new_hobby.value != ""){
+                    db.collection("hobbies").add({
+                        hobby: new_hobby.value
+                    })
+                    console.log("Item successfully added");
+                    modal2.style.display="none";
+                }
+            })
+        }
+
+        function closeModal1(){
+            modal2.style.display = "none";
+        }
+
+        // modal for orgs
+
+        var modal3 = document.getElementById("modal3");
+        var add_org = document.getElementById("add_org");
+        var close2 = document.getElementsByClassName("close")[2];
+        var org_submit = document.getElementById("org_submit");
+        var new_org_logo = document.getElementById("new_org_logo");
+        var new_org_name = document.getElementById("new_org_name");
+        var new_org_position = document.getElementById("new_org_position");
+
+        add_org.addEventListener("click", openModal2);
+        close2.addEventListener("click", closeModal2);
+
+        function openModal2(){
+            modal3.style.display = "block";
+            org_submit.addEventListener("click",function(e){
+                e.preventDefault();
+                    db.collection("organizations").add({
+                        logo: new_org_logo.value,
+                        org_name: new_org_name.value,
+                        position: new_org_position.value
+                    })
+                    console.log("Item successfully added");
+                    modal3.style.display="none";
+            })
+        }
+
+        function closeModal2(){
+            modal3.style.display = "none";
+        }
+
+        // modal for education
+
+        var modal4 = document.getElementById("modal4");
+        var add_school = document.getElementById("add_school");
+        var close3 = document.getElementsByClassName("close")[3];
+        var school_submit = document.getElementById("school_submit");
+        var new_school_logo = document.getElementById("new_org_logo");
+        var new_school_name = document.getElementById("new_school_name");
+        var new_year_end = document.getElementById("new_year_end");
+        var new_year_start = document.getElementById("new_year_start");
+
+        add_school.addEventListener("click", openModal3);
+        close3.addEventListener("click", closeModal3);
+
+        function openModal3(){
+            modal4.style.display = "block";
+            school_submit.addEventListener("click",function(e){
+                e.preventDefault();
+                    db.collection("educations").add({
+                        logo: new_school_logo.value,
+                        school: new_school_name.value,
+                        year_end: new_year_end.value,
+                        year_start: new_year_start.value
+                    })
+                    console.log("Item successfully added");
+                    modal4.style.display="none";
+            })
+        }
+
+        function closeModal3(){
+            modal4.style.display = "none";
+        }
+
+        // modal for works
+
+        var modal5 = document.getElementById("modal5");
+        var add_work = document.getElementById("add_work");
+        var close4 = document.getElementsByClassName("close")[4];
+        var work_submit = document.getElementById("work_submit");
+        var new_work_title = document.getElementById("new_work_title");
+        var new_work_link = document.getElementById("new_work_language");
+        var new_work_language = document.getElementById("new_work_language");
+        var new_work_description = document.getElementById("new_work_description");
+
+        add_work.addEventListener("click", openModal4);
+        close4.addEventListener("click", closeModal4);
+
+        function openModal4(){
+            modal5.style.display = "block";
+            work_submit.addEventListener("click",function(e){
+                e.preventDefault();
+                    db.collection("works").add({
+                        description: new_work_description.value,
+                        lab: new_work_language.value,
+                        link: new_work_link.value,
+                        name: new_work_title.value
+                    })
+                    console.log("Item successfully added");
+                    modal5.style.display="none";
+            })
+        }
+
+        function closeModal4(){
+            modal5.style.display = "none";
+        }
+
+    </script>
     </body>
 </html>
