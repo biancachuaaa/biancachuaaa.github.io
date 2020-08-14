@@ -205,8 +205,6 @@
                     db.collection("contact").doc(uid.id).update({
                         username: edit_username.value,
                         url: edit_link.value
-                    }).then(function(doc){
-                        changeContact();
                     })
                     $("#edit_username").val("");
                     $("#edit_link").val("");
@@ -221,16 +219,6 @@
 
         function closeModal5(){
             modal6.style.display = "none";
-        }
-
-        function changeContact(){
-            db.collection('contact').onSnapshot(function(snapshot){
-                $("footer#edit_contact_container").empty();
-                snapshot.docChanges().forEach(function(change){
-                    document.getElementById('edit_contact_container').innerHTML += `<img class="sm_logo" src ="${change.doc.data().logo}"> <button class="contact_edit" id="${change.doc.id}" onClick=editing_contact(this)>Edit</button>`;
-                    document.getElementById('edit_contact_container').innerHTML += `<a href="${change.doc.data().url}">${change.doc.data().username}</a>`;
-                });
-            })
         }
 
         db.collection("contact").get().then((snapshot) =>{
