@@ -64,8 +64,11 @@
             db.collection("educations").orderBy('year_start','asc').get().then((snapshot) =>{
                 snapshot.forEach((doc) => {
                     document.getElementById('education_template').innerHTML += `<div id = "edu_logo_template"><img class="education_logo" src ="${doc.data().logo}"></div>`;
-                    if((doc.data().grade_start && doc.data().grade_end && doc.data().year_end) == null){
-                        document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - Present</div>`;
+                    if(doc.data().year_end == null){
+                        document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - Present | Degree: ${doc.data().degree}</div>`;
+                    }
+                    else if((doc.data().grade_start && doc.data().grade_end) == null){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end}| Degree: ${doc.data().degree}</div>`;
                     }
                     else if(doc.data().grade_end == doc.data().grade_start){
                         document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end} | Grade ${doc.data().grade_start}</div>`;   

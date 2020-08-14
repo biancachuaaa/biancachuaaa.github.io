@@ -516,6 +516,7 @@ form button:hover{
 
 #new_work_description{
     font-family: 'Montserrat';
+    margin-left: 10px;
 }
 
 @keyframes modalopen{

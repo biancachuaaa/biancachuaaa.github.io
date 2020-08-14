@@ -92,8 +92,9 @@
                     <form id="adding_school">
                         <span>Logo: </span><input id = "new_school_logo" type = "text" placeholder="Place URL of logo">
                         <span>School name: </span><input id = "new_school_name" type = "text" placeholder="insert name of school">
-                        <span>Year Start: </span><input id = "new_year_start" type = "text" placeholder="insert year started at the school">
-                        <span>Year End: </span><input id = "new_year_end" type = "text" placeholder="insert year ended at the school">
+                        <span>Year Start: </span><input id = "new_year_start" type = "number" placeholder="insert year started at the school">
+                        <span>Year End: </span><input id = "new_year_end" type = "number" placeholder="insert year ended at the school">
+                        <span>Degree: </span><input id = "new_degree" type = "text" placeholder="insert degree attained">
                         <button id = "school_submit">Add</button>
                     </form>
                 </div>
@@ -111,7 +112,7 @@
                         <span>Title: </span><input id = "new_work_title" type = "text" placeholder="Place the title of the project">
                         <span>Link: </span><input id = "new_work_link" type = "text" placeholder="insert the link to your project">
                         <span>Language used: </span><input id = "new_work_language" type = "text" placeholder="input the language you used to create the project">
-                        <span>Description: </span><textarea id ="new_work_description" rows="10"cols="115"></textarea>
+                        <span>Description: </span><textarea id ="new_work_description" rows="10"cols="122"></textarea>
                         <button id = "work_submit">Add</button>
                     </form>
                 </div>
@@ -134,7 +135,7 @@
         </div>
 
 
-
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
          <!-- The core Firebase JS SDK is always required and must be listed first -->
     <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
 
@@ -196,17 +197,36 @@
             modal6.style.display = "block";
             edit_contact.addEventListener("click",function(e){
                 e.preventDefault();
+                if((edit_link.value != "") && (edit_username.value != "")){
                     db.collection("contact").doc(uid.id).update({
                         username: edit_username.value,
                         url: edit_link.value
+                    }).then(function(doc){
+                        changeContact();
                     })
-                modal6.style.display="none";
-                console.log("Item succesfully updated");
+                    $("#edit_username").val("");
+                    $("#edit_link").val("");
+                    modal6.style.display="none";
+                    console.log("Item succesfully updated");
+                }
+                else{
+                    alert("Please input all data required in the given form");
+                }
             })
         }
 
         function closeModal5(){
             modal6.style.display = "none";
+        }
+
+        function changeContact(){
+            db.collection('contact').onSnapshot(function(snapshot){
+                $("footer#edit_contact_container").empty();
+                snapshot.docChanges().forEach(function(change){
+                    document.getElementById('edit_contact_container').innerHTML += `<img class="sm_logo" src ="${change.doc.data().logo}"> <button class="contact_edit" id="${change.doc.id}" onClick=editing_contact(this)>Edit</button>`;
+                    document.getElementById('edit_contact_container').innerHTML += `<a href="${change.doc.data().url}">${change.doc.data().username}</a>`;
+                });
+            })
         }
 
         db.collection("contact").get().then((snapshot) =>{
@@ -219,7 +239,8 @@
         function erase_hobby(uid){
                 db.collection("hobbies").doc(uid.id).delete().then(function(){
                     console.log("Item successfully deleted with UID: "+uid.id);
-                })   
+                    changeHobby();
+                })
         }
 
         db.collection("hobbies").get().then((snapshot) =>{
@@ -231,6 +252,7 @@
         function erase_org(uid){
                 db.collection("organizations").doc(uid.id).delete().then(function(){
                     console.log("Item successfully deleted with UID: "+uid.id);
+                    changeOrg();
                 })   
         }
         db.collection("organizations").get().then((snapshot) =>{
@@ -242,14 +264,18 @@
         function erase_school(uid){
                 db.collection("educations").doc(uid.id).delete().then(function(){
                     console.log("Item successfully deleted with UID: "+uid.id);
+                    changeEduc();
                 })   
         }
 
         db.collection("educations").orderBy('year_start','asc').get().then((snapshot) =>{
                 snapshot.forEach((doc) => {
                     document.getElementById('education_template').innerHTML += `<div id = "edu_logo_template"><img class="education_logo" src ="${doc.data().logo}"></div>`;
-                    if((doc.data().grade_start && doc.data().grade_end && doc.data().year_end) == null){
+                    if(doc.data().year_end == null){
                         document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - Present | Degree: ${doc.data().degree}<button class="delete"  id="${doc.id}" onClick=erase_school(this)>&times;</button></div>`;
+                    }
+                    else if((doc.data().grade_start && doc.data().grade_end) == null){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end}| Degree: ${doc.data().degree}<button class="delete"  id="${doc.id}" onClick=erase_school(this)>&times;</button></div>`;
                     }
                     else if(doc.data().grade_end == doc.data().grade_start){
                         document.getElementById('education_template').innerHTML += `<div id = "education_details">${doc.data().school}<br><br> A.Y. ${doc.data().year_start} - ${doc.data().year_end} | Grade ${doc.data().grade_start} <button class="delete"  id="${doc.id}" onClick=erase_school(this)>&times;</button></div>`;   
@@ -263,6 +289,7 @@
         function erase_work(uid){
                 db.collection("works").doc(uid.id).delete().then(function(){
                     console.log("Item successfully deleted with UID: "+uid.id);
+                    changeWork();
                 })   
         }
         
@@ -291,15 +318,30 @@
                 if(edit_descript.value != ""){
                     db.collection("about").doc("WJFXcGzbexFcm2hFUaNS").update({
                         introduction: edit_descript.value
+                    }).then(function(doc){
+                        changeAbout();
                     })
+                    $("#edit_descript").val("");
                     modal1.style.display="none";
-                    console.log="Item succesfully updated"
+                    console.log=("Item succesfully updated");
+                }
+                else{
+                    alert("Please input all data required in the given form");
                 }
             })
         }
 
         function closeModal(){
             modal1.style.display = "none";
+        }
+
+        function changeAbout(){
+            db.collection('about').onSnapshot(function(snapshot){
+                $("div#introduction").empty();
+                snapshot.docChanges().forEach(function(change){
+                    document.getElementById('introduction').innerHTML += `${change.doc.data().introduction}`;
+                });
+            })
         }
 
         // modal for hobbies
@@ -320,12 +362,33 @@
                 if(new_hobby.value != ""){
                     db.collection("hobbies").add({
                         hobby: new_hobby.value
+                    }).then(function(doc){
+                        changeHobby();
                     })
+                    $("form input#new_hobby").val("");
                     console.log("Item successfully added");
                     modal2.style.display="none";
                 }
+                else{
+                    alert("Please Input all data required in the given form");
+                }
+            });
+        }
+
+        function changeHobby(){
+            db.collection('hobbies').onSnapshot(function(snapshot){
+                $("div#hobby_list").empty();
+                snapshot.docChanges().forEach(function(change){
+                    if(change.type === "added"){
+                        document.getElementById('hobby_list').innerHTML += `<div>${change.doc.data().hobby} <button class="delete"  id="${change.doc.id}" onClick=erase_hobby(this)>&times;</button></div>`;
+                    }
+                    if(change.type === "removed"){
+                        document.getElementById('hobby_list').innerHTML += `<div>${change.doc.data().hobby} <button class="delete"  id="${change.doc.id}" onClick=erase_hobby(this)>&times;</button></div>`;
+                    }
+                });
             })
         }
+
 
         function closeModal1(){
             modal2.style.display = "none";
@@ -348,18 +411,42 @@
             modal3.style.display = "block";
             org_submit.addEventListener("click",function(e){
                 e.preventDefault();
-                    db.collection("organizations").add({
+                    if((new_org_logo.value != "") && (new_org_name.value != "") && (new_org_position.value != "")){
+                        db.collection("organizations").add({
                         logo: new_org_logo.value,
                         org_name: new_org_name.value,
                         position: new_org_position.value
+                    }).then(function(doc){
+                        changeOrg();
                     })
+                    $("form input#new_org_logo").val("");
+                    $("form input#new_org_name").val("");
+                    $("form input#new_org_position").val("");
                     console.log("Item successfully added");
                     modal3.style.display="none";
+                    }
+                    else{
+                        alert("Please Input all data required in the given form");
+                    }
             })
         }
 
         function closeModal2(){
             modal3.style.display = "none";
+        }
+
+        function changeOrg(){
+            db.collection('organizations').onSnapshot(function(snapshot){
+                $("div#org_container").empty();
+                snapshot.docChanges().forEach(function(change){
+                    if(change.type === "added"){
+                        document.getElementById('org_container').innerHTML += `<div id = "orgs"><img class="org_logo" src ="${change.doc.data().logo}"><br>${change.doc.data().org_name}<br>${change.doc.data().position} <button class="delete"  id="${change.doc.id}" onClick=erase_org(this)>&times;</button></div>`;
+                    }
+                    if(change.type === "removed"){
+                        document.getElementById('org_container').innerHTML += `<div id = "orgs"><img class="org_logo" src ="${change.doc.data().logo}"><br>${change.doc.data().org_name}<br>${change.doc.data().position} <button class="delete"  id="${change.doc.id}" onClick=erase_org(this)>&times;</button></div>`;
+                    }
+                });
+            })
         }
 
         // modal for education
@@ -368,10 +455,11 @@
         var add_school = document.getElementById("add_school");
         var close3 = document.getElementsByClassName("close")[3];
         var school_submit = document.getElementById("school_submit");
-        var new_school_logo = document.getElementById("new_org_logo");
+        var new_school_logo = document.getElementById("new_school_logo");
         var new_school_name = document.getElementById("new_school_name");
         var new_year_end = document.getElementById("new_year_end");
         var new_year_start = document.getElementById("new_year_start");
+        var new_degree = document.getElementById("new_degree");
 
         add_school.addEventListener("click", openModal3);
         close3.addEventListener("click", closeModal3);
@@ -380,19 +468,70 @@
             modal4.style.display = "block";
             school_submit.addEventListener("click",function(e){
                 e.preventDefault();
+                if((new_school_logo.value != "") && (new_school_name.value != "") && (new_year_end.value != "") && (new_year_start.value != "") && (new_degree.value != "")){
                     db.collection("educations").add({
                         logo: new_school_logo.value,
                         school: new_school_name.value,
-                        year_end: new_year_end.value,
-                        year_start: new_year_start.value
+                        year_end: parseInt(new_year_end.value),
+                        year_start: parseInt(new_year_start.value),
+                        degree: new_degree.value
+                    }).then(function(doc){
+                        changeEduc();
                     })
+                    $("form input#new_school_logo").val("");
+                    $("form input#new_school_name").val("");
+                    $("form input#new_year_start").val("");
+                    $("form input#new_year_end").val("");
+                    $("form input#new_degree").val("");
                     console.log("Item successfully added");
                     modal4.style.display="none";
+                }
+                else{
+                    alert("Please Input all data required in the given form");
+                }
             })
         }
 
         function closeModal3(){
             modal4.style.display = "none";
+        }
+
+        function changeEduc(){
+            db.collection('educations').orderBy('year_start','asc').onSnapshot(function(snapshot){
+                $("div#education_template").empty();
+                snapshot.docChanges().forEach(function(change){
+                    if(change.type === "added"){
+                        document.getElementById('education_template').innerHTML += `<div id = "edu_logo_template"><img class="education_logo" src ="${change.doc.data().logo}"></div>`;
+                            if(change.doc.data().year_end == null){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${change.doc.data().school}<br><br> A.Y. ${change.doc.data().year_start} - Present | Degree: ${change.doc.data().degree}<button class="delete"  id="${change.doc.id}" onClick=erase_school(this)>&times;</button></div>`;
+                            }
+                            else if((change.doc.data().grade_start && change.doc.data().grade_end) == null){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${change.doc.data().school}<br><br> A.Y. ${change.doc.data().year_start} - ${change.doc.data().year_end}| Degree: ${change.doc.data().degree}<button class="delete"  id="${change.doc.id}" onClick=erase_school(this)>&times;</button></div>`;
+                            }
+                            else if(change.doc.data().grade_end == change.doc.data().grade_start){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${change.doc.data().school}<br><br> A.Y. ${change.doc.data().year_start} - ${change.doc.data().year_end} | Grade ${change.doc.data().grade_start} <button class="delete"  id="${change.doc.id}" onClick=erase_school(this)>&times;</button></div>`;   
+                            }
+                            else{
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${change.doc.data().school}<br><br> A.Y. ${change.doc.data().year_start} - ${change.doc.data().year_end} | Grades ${change.doc.data().grade_start}-${change.doc.data().grade_end} <button class="delete"  id="${change.doc.id}" onClick=erase_school(this)>&times;</button></div>`;
+                            }
+                    }
+                    if(change.type === "removed"){
+                        document.getElementById('education_template').innerHTML += `<div id = "edu_logo_template"><img class="education_logo" src ="${change.doc.data().logo}"></div>`;
+                            if((change.doc.data().grade_start && change.doc.data().grade_end && change.doc.data().year_end) == null){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${change.doc.data().school}<br><br> A.Y. ${change.doc.data().year_start} - Present | Degree: ${change.doc.data().degree}<button class="delete"  id="${change.doc.id}" onClick=erase_school(this)>&times;</button></div>`;
+                            }
+                            else if((change.doc.data().grade_start.value && change.doc.data().grade_end.value) == null){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${change.doc.data().school}<br><br> A.Y. ${change.doc.data().year_start} - ${change.doc.data().year_end}| Degree: ${change.doc.data().degree}<button class="delete"  id="${change.doc.id}" onClick=erase_school(this)>&times;</button></div>`;
+                            }
+                            else if(change.doc.data().grade_end == change.doc.data().grade_start){
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${change.doc.data().school}<br><br> A.Y. ${change.doc.data().year_start} - ${change.doc.data().year_end} | Grade ${change.doc.data().grade_start} <button class="delete"  id="${change.doc.id}" onClick=erase_school(this)>&times;</button></div>`;   
+                            }
+                            else{
+                                document.getElementById('education_template').innerHTML += `<div id = "education_details">${change.doc.data().school}<br><br> A.Y. ${change.doc.data().year_start} - ${change.doc.data().year_end} | Grades ${change.doc.data().grade_start}-${change.doc.data().grade_end} <button class="delete"  id="${change.doc.id}" onClick=erase_school(this)>&times;</button></div>`;
+                            }
+                    }
+                });
+            })
         }
 
         // modal for works
@@ -402,7 +541,7 @@
         var close4 = document.getElementsByClassName("close")[4];
         var work_submit = document.getElementById("work_submit");
         var new_work_title = document.getElementById("new_work_title");
-        var new_work_link = document.getElementById("new_work_language");
+        var new_work_link = document.getElementById("new_work_link");
         var new_work_language = document.getElementById("new_work_language");
         var new_work_description = document.getElementById("new_work_description");
 
@@ -413,19 +552,46 @@
             modal5.style.display = "block";
             work_submit.addEventListener("click",function(e){
                 e.preventDefault();
+                if((new_work_title.value != "") && (new_work_link.value != "") && (new_work_language.value != "") && (new_work_description.value != "")){
                     db.collection("works").add({
                         description: new_work_description.value,
                         lab: new_work_language.value,
                         link: new_work_link.value,
                         name: new_work_title.value
+                    }).then(function(doc){
+                        changeWork();
                     })
+                    $("#new_work_description").val("");
+                    $("#new_work_language").val("");
+                    $("#new_work_link").val("");
+                    $("#new_work_title").val("");
                     console.log("Item successfully added");
                     modal5.style.display="none";
+                }
+                else{
+                    alert("Please Input all data required in the given form");
+                }
             })
         }
 
         function closeModal4(){
             modal5.style.display = "none";
+        }
+
+        function changeWork(){
+            db.collection('works').onSnapshot(function(snapshot){
+                $("div#project").empty();
+                snapshot.docChanges().forEach(function(change){
+                    if(change.type === "added"){
+                        document.getElementById('project').innerHTML += `<a href="${change.doc.data().link}">${change.doc.data().name}</a> <button class="delete_work"  id="${change.doc.id}" onClick=erase_work(this)>&times;</button> <br><br>`;
+                        document.getElementById('project').innerHTML += `<div id = "description">Programming language used: ${change.doc.data().lab}<br><br>${change.doc.data().description}<br><br><br>`;
+                    }
+                    if(change.type === "removed"){
+                        document.getElementById('project').innerHTML += `<a href="${change.doc.data().link}">${change.doc.data().name}</a> <button class="delete_work"  id="${change.doc.id}" onClick=erase_work(this)>&times;</button> <br><br>`;
+                        document.getElementById('project').innerHTML += `<div id = "description">Programming language used: ${change.doc.data().lab}<br><br>${change.doc.data().description}<br><br><br>`;
+                    }
+                });
+            })
         }
 
     </script>
