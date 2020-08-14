@@ -173,7 +173,11 @@
                 console.log("success");
                 document.getElementsByClassName("login_box")[0].style.display = "none";
                 document.getElementById("editable_info").style.display = "block";
+            }).catch(function(error){
+                alert(error);
             });
+            
+
         })
 
 
